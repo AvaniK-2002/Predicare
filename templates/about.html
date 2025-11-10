@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us - PredictCare</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+        }
+        body {
+            line-height: 1.6;
+            color: #333;
+        }
+        header {
+            background-color: #6d11b4;
+            color: white;
+            padding: 1.5rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            width: 100%;
+            z-index: 1000;
+        }
+        .logo {
+            font-size: 2.5rem;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        nav a {
+            color: white;
+            font-size: 1.7rem;
+            margin: 0 1.5rem;
+            text-decoration: none;
+        }
+        nav a:hover {
+            color: #ffd700;
+        }
+        .container {
+            padding: 10rem 5%;
+        }
+        .about-section {
+            text-align: center;
+            padding: 4rem 2rem;
+            background-color: #f9f9f9;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        .about-section h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: #6d11b4;
+        }
+        .about-section p {
+            font-size: 1.6rem;
+            margin: 1.5rem 0;
+        }
+        .features-list {
+            margin-top: 3rem;
+        }
+        .features-list h2 {
+            font-size: 2rem;
+            color: #6d11b4;
+        }
+        .features-list ul {
+            margin-top: 1rem;
+            list-style: none;
+        }
+        .features-list li {
+            font-size: 1.5rem;
+            margin: 1rem 0;
+            display: flex;
+            align-items: center;
+        }
+        .features-list li i {
+            margin-right: 1rem;
+            color: #6d11b4;
+        }
+        footer {
+            text-align: center;
+            padding: 1rem 0;
+            background-color: #6d11b4;
+            color: white;
+            margin-top: 4rem;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <div class="logo">PredictCare</div>
+    <nav>
+        <a href="/">Home</a>
+        <a href="/nearby_hospitals">Hospitals</a>
+        <a href="/schemes">Government Schemes</a>
+        <a href="/about">About</a>
+        <a href="/hospital_dash">Hospital dashboard</a>
+    </nav>
+</header>
+
+<div class="container">
+    <div class="about-section">
+        <h1>About Us</h1>
+        <p>Welcome to <strong>PredictCare</strong>, your one-stop solution for personalized healthcare assistance. We aim to bridge the gap between patients and top-notch healthcare facilities, bringing convenience and advanced technology to your fingertips.</p>
+        <p>With a mission to empower individuals with access to quality medical resources and expert advice, DocSage leverages state-of-the-art tools like virtual consultations, and more.</p>
+        <div class="features-list">
+            <h2>Our Features</h2>
+            <ul>
+                <li><i class="fa fa-hospital"></i> Nearest Hospital Suggestions</li>
+                <li><i class="fa fa-lightbulb"></i> Government Scheme Recommendations</li>
+                <li><i class="fa fa-cloud"></i> Cloud-Based Report Storage</li>
+                <li><i class="fa fa-video"></i> Virtual Doctor Meetings</li>
+                <li><i class="fa fa-calendar-check"></i> Online Appointment Scheduling</li>
+                <li><i class="fa fa-heart"></i> Daily Health Checkups</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Community Forum</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f5f5f5;
+        }
+        .container {
+            width: 80%;
+            margin: 0 auto;
+        }
+        .community-container {
+            background-color: #fff;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+            margin-top: 50px;
+        }
+        .community-container h2 {
+            margin-bottom: 20px;
+            color: #444;
+        }
+        .question-box input, .question-box textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            outline: none;
+        }
+        .question-box button {
+            padding: 10px 20px;
+            background: linear-gradient(45deg, #47cebe, #ef4a82);
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .community-posts {
+            margin-top: 20px;
+        }
+        .post {
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+        .post .answers {
+            margin-left: 20px;
+            margin-top: 10px;
+        }
+        .post .answer-box {
+            margin-top: 10px;
+        }
+        .post .answer-box input {
+            width: 80%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            outline: none;
+        }
+        .post .answer-box button {
+            padding: 8px;
+            background-color: #47cebe;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="community-container">
+        <h2>Community Forum</h2>
+
+        <div class="question-box">
+            <input id="questionInput" type="text" placeholder="Ask a question..." />
+            <button id="askQuestionBtn">Submit Question</button>
+        </div>
+
+        <div class="community-posts" id="communityPosts">
+            <!-- Questions and answers will be dynamically added here -->
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
+<script>
+    const socket = io.connect('http://' + document.domain + ':' + location.port);
+
+    const communityPosts = document.getElementById('communityPosts');
+    const questionInput = document.getElementById('questionInput');
+    const askQuestionBtn = document.getElementById('askQuestionBtn');
+
+    // Load existing questions when the page loads
+    async function loadQuestions() {
+        const response = await fetch('/get_questions');
+        const questions = await response.json();
+
+        questions.forEach(question => {
+            addQuestionToDOM(question);
+        });
+    }
+
+    // Add a question to the DOM
+    function addQuestionToDOM(question) {
+        const postDiv = document.createElement('div');
+        postDiv.classList.add('post');
+        postDiv.innerHTML = `
+            <p><strong>Question:</strong> ${question.content}</p>
+            <div class="answers" id="answers-${question.id}">
+                ${question.answers.map(answer => `<p>Answer: ${answer.content}</p>`).join('')}
+            </div>
+            <div class="answer-box">
+                <input type="text" placeholder="Add an answer..." id="answerInput-${question.id}">
+                <button onclick="submitAnswer(${question.id})">Submit Answer</button>
+            </div>
+        `;
+        communityPosts.prepend(postDiv);  // Add new questions at the top
+    }
+
+    // Submit a new question
+    askQuestionBtn.addEventListener('click', async () => {
+        const questionContent = questionInput.value.trim();
+
+        if (questionContent === '') return;
+
+        // Post question to the server
+        const response = await fetch('/add_question', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ content: questionContent })
+        });
+
+        if (response.ok) {
+            questionInput.value = '';  // Clear input after submission
+        }
+    });
+
+    // Submit a new answer
+    async function submitAnswer(questionId) {
+        const answerInput = document.getElementById(`answerInput-${questionId}`);
+        const answerContent = answerInput.value.trim();
+
+        if (answerContent === '') return;
+
+        // Post answer to the server
+        const response = await fetch(`/add_answer/${questionId}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ content: answerContent })
+        });
+
+        if (response.ok) {
+            answerInput.value = '';  // Clear input after submission
+        }
+    }
+
+    // Listen for new questions in real-time
+    socket.on('new_question', (data) => {
+        addQuestionToDOM(data);
+    });
+
+    // Listen for new answers in real-time
+    socket.on('new_answer', (data) => {
+        const answersDiv = document.getElementById(`answers-${data.question_id}`);
+        answersDiv.innerHTML += `<p>Answer: ${data.content}</p>`;
+    });
+
+    // Load initial questions when the page loads
+    loadQuestions();
+</script>
+
+</body>
+</html>

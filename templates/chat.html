@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Page</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="/socket.io/socket.io.js"></script>
+</head>
+<body>
+    <div class="chat-container">
+        <div id="chat-window" class="chat-window"></div>
+        <input type="text" id="chat-input" class="chat-input" placeholder="Type your message here...">
+        <button onclick="sendMessage()" class="send-button">Send</button>
+    </div>
+
+    <script>
+        const socket = io();
+        const userId = 'user123'; // Replace with dynamic user ID
+        const receiverId = 'doctor456'; // Replace with dynamic receiver ID
+
+        function sendMessage() {
+            const message = document.getElementById('chat-input').value;
+            socket.emit('send_message', { sender_id: userId, receiver_id: receiverId, message });
+            document.getElementById('chat-input').value = '';
+        }
+
+        socket.on('receive_message', (data) => {
+            const chatWindow = document.getElementById('chat-window');
+            chatWindow.innerHTML += `<p><strong>${data.sender_id === userId ? 'You' : 'Doctor'}:</strong> ${data.message}</p>`;
+            chatWindow.scrollTop = chatWindow.scrollHeight;
+        });
+
+        // Community Functions
+        function createPost() {
+            const content = document.getElementById('new-post').value;
+            fetch('/posts', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ user_id: userId, title: 'My Post', content })
+            }).then(() => loadPosts());
+        }
+
+        function loadPosts() {
+            // Load posts logic here
+        }
+    </script>
+</body>
+</html>
