@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Realtime Chat</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f4f4f9;
+    }
+    
+    .container {
+        width: 80%;
+        margin: auto;
+        padding: 20px;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+    
+    h1 {
+        text-align: center;
+        color: #333;
+    }
+    
+    #doctor-search, #chat-section, #community-section {
+        margin-bottom: 30px;
+    }
+    
+    #chat-window {
+        border: 1px solid #ddd;
+        padding: 10px;
+        height: 200px;
+        overflow-y: auto;
+        background-color: #f9f9f9;
+        margin-bottom: 10px;
+    }
+    
+    #post-list li, #doctor-list li {
+        list-style: none;
+        margin-bottom: 10px;
+        background: #eef;
+        padding: 10px;
+        border-radius: 5px;
+    }
+    
+</style>
+
+<body>
+    <div class="container">
+        <h1>Realtime Chat and Community</h1>
+
+        <!-- Doctor Search -->
+        <div id="doctor-search">
+            <h2>Search for Doctors</h2>
+            <input type="text" id="search-specialty" placeholder="Enter specialty">
+            <button onclick="searchDoctors()">Search</button>
+            <ul id="doctor-list"></ul>
+        </div>
+
+        <!-- Chat Section -->
+        <div id="chat-section">
+            <h2>Chat</h2>
+            <div id="chat-window"></div>
+            <input type="text" id="chat-input" placeholder="Type a message">
+            <button onclick="sendMessage()">Send</button>
+        </div>
+
+        <!-- Community Section -->
+        <div id="community-section">
+            <h2>Community Posts</h2>
+            <textarea id="new-post" placeholder="Write a new post"></textarea>
+            <button onclick="createPost()">Create Post</button>
+            <ul id="post-list"></ul>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js">
+        const socket = io('http://127.0.0.1:5000'); // Connect to backend
+
+// Search Doctors
+function searchDoctors() {
+    const specialty = document.getElementById('search-specialty').value;
+    fetch(`/doctors?specialty=${specialty}`)
+        .then(response => response.json())
+        .then(data => {
+            const doctorList = document.getElementById('doctor-list');
+            doctorList.innerHTML = data.map(doctor => `<li>${doctor.name} - ${doctor.specialty}</li>`).join('');
+        });
+}
+
+// Chat Functions
+let userId = 1;  // Replace with authenticated user ID
+let receiverId = 2;  // Replace with selected doctor ID
+
+function sendMessage() {
+    const message = document.getElementById('chat-input').value;
+    socket.emit('send_message', { sender_id: userId, receiver_id: receiverId, message });
+    document.getElementById('chat-input').value = '';
+}
+
+socket.on('receive_message', (data) => {
+    const chatWindow = document.getElementById('chat-window');
+    chatWindow.innerHTML += `<p><strong>${data.sender_id === userId ? 'You' : 'Doctor'}:</strong> ${data.message}</p>`;
+});
+
+// Community Functions
+function createPost() {
+    const content = document.getElementById('new-post').value;
+    fetch('/posts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ user_id: userId, title: 'My Post', content })
+    }).then(() => loadPosts());
+}
+
+function loadPosts() {
+    fetch('/posts')
+        .then(response => response.json())
+        .then(posts => {
+            const postList = document.getElementById('post-list');
+            postList.innerHTML = posts.map(post => `<li>${post.title}: ${post.content}</li>`).join('');
+        });
+}
+
+loadPosts();  // Initial load of posts
+
+    </script>
+    <script src="script.js"></script>
+</body>
+</html>
